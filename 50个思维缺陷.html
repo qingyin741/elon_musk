@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>马斯克分享的50个思维陷阱</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            scroll-behavior: smooth;
+            /* Animated Gradient Background */
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #3b82f6, #1e293b);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+        }
+
+        /* Card Styles: Glassmorphism */
+        .card {
+            background-color: rgba(31, 41, 55, 0.5); /* bg-slate-800 with 50% opacity */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            transform-style: preserve-3d; /* Needed for 3D hover effect */
+        }
+
+        /* Card Hover Effects: 3D Tilt and Glow */
+        .card:hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(-3deg) scale(1.05);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3), 
+                        0 0 30px rgba(59, 130, 246, 0.2), 
+                        0 0 60px rgba(96, 165, 250, 0.2);
+        }
+
+        .card-number {
+            color: #4b5563; /* slate-600 */
+            font-size: 3rem;
+            font-weight: 700;
+        }
+        
+        #biases-grid {
+             perspective: 1500px; /* Add perspective to the parent for 3D effect */
+        }
+
+        /* Animation Keyframes */
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in-up {
+            opacity: 0; /* Start hidden */
+        }
+
+        .is-visible {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .header-title {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .header-subtitle {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.3s forwards;
+        }
+
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-300">
+
+    <!-- Header Section -->
+    <header class="text-center py-12 md:py-20 bg-transparent sticky top-0 z-10 overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+        <div class="relative">
+            <h1 class="header-title text-4xl md:text-6xl font-bold text-white mb-4">
+                50个思维陷阱
+            </h1>
+            <p class="header-subtitle text-lg md:text-xl text-slate-400 max-w-3xl mx-auto">
+                埃隆·马斯克分享的认知偏差列表，帮助我们更好地识别生活中的真相，更客观理性地看待事物。
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="container mx-auto px-4 py-12">
+        <div id="biases-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Cards will be injected here by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 mt-12 border-t border-slate-800">
+        <p class="text-slate-500">内容来源于网络分享，由AI生成此页面。</p>
+    </footer>
+
+    <script>
+        const biases = [
+            { "id": "01", "name": "基本归因错误", "description": "人们经常根据个性或者性格来定义别人，但会用情境因素帮自己开脱。", "example": "举例：Sally上课迟到，肯定是她懒；你自己迟到，就是因为早上太忙乱了。" },
+            { "id": "02", "name": "自私的偏见", "description": "我们的失败是形势所迫，而我们的成功是理所当然。失败总是有原因的，而成功全靠自己。", "example": "举例：你觉得得奖是因为自己努力工作，而不是靠别人的帮助和运气。但如果考试不及格，只是因为睡眠不足而已。" },
+            { "id": "03", "name": "组内偏爱", "description": "我们偏爱同一个圈子的圈内人，而不是圈外人。", "example": "举例：Francis 跟你一个社团，所以你喜欢他多过 Sally。" },
+            { "id": "04", "name": "从众效应", "description": "当个体受到群体的影响，会怀疑并改变自己的观点、判断和行为，朝着与群体大多数人一致的方向变化。", "example": "举例：Sally觉得指尖陀螺对孩子挺好的，Francis 也这么觉得。" },
+            { "id": "05", "name": "群体思维", "description": "希望团队保持一致与和谐，我们有时会为了减少冲突做出一些非理性的决定。", "example": "举例：Sally 想买冰淇淋，Francis 想买T恤，所以你最终建议买印有冰淇淋图案的T恤。" },
+            { "id": "06", "name": "光环效应", "description": "这种爱屋及乌的强烈知觉的品质或特点，就像月晕的光环一样，向周围弥漫、扩散。", "example": "举例：Taylor 这么可爱，她肯定一点也不刻薄！" },
+            { "id": "07", "name": "道德运气", "description": "由于一个好的结果，会提高人们对他道德地位的评价，反之由于一个坏的结果，会降低人们对他道德地位的评价。", "example": "举例：xx文化赢得了xx之争，是因为他们比输掉的人更有德行。" },
+            { "id": "08", "name": "虚假的共识", "description": "我们认为同意我们观点的人比实际同意我们观点的人要多。", "example": "举例：“所有人都这么想！”" },
+            { "id": "09", "name": "知识的诅咒", "description": "一旦我们知道某种东西，我们就会认为其他人也都知道它。", "example": "举例：Alice是一名架构师，他很难站在程序员小白的角度来理解他们不懂的地方。" },
+            { "id": "10", "name": "聚光灯效应", "description": "一般是指人觉得自己会一定受到别人的关注，而将自己的问题无限放大。", "example": "举例：Sally 很担心大家会注意到她的冰淇淋T恤有多丑。" },
+            { "id": "11", "name": "可用性启发", "description": "做决定时，我们会依赖于脑海中直接浮现的例子。", "example": "举例：选择商店时，你通常会选择最近看到过广告的那家。" },
+            { "id": "12", "name": "防御性归因", "description": "当我们与受害者共情时，我们会减少对受害方的指责，增加对攻击方的指控。", "example": "举例：Sally等绿灯时一直在车里玩手机，结果被追尾了。目击事故的Greg 也有开车发短信的习惯。所以他下了车，对撞了Sally的人大吼大叫。" },
+            { "id": "13", "name": "公正世界假说", "description": "我们倾向于认为这个世界是公正的，我们认为遭受不公是活该。", "example": "举例：我们通常会认定穷人之所以穷是因为懒惰，要么是因为愚蠢，要么两者都有。" },
+            { "id": "14", "name": "朴素现实主义", "description": "我们相信自己观察到的就是客观现实，而其他人则是不理性，不知情或者有偏见的。", "example": "举例：“我看到了这个世界的真面目，其他人都很蠢”" },
+            { "id": "15", "name": "朴素犬儒主义", "description": "我们认为自己观察到的就是客观现实，而其他人的所作所为都会更加以自我为中心且有所图谋。", "example": "举例：“这人对我好的唯一原因，肯定是想从我这得到点什么。”" },
+            { "id": "16", "name": "富勒效应 (巴纳姆效应)", "description": "我们容易将我们的个性归纳为模糊的陈述，即使它适用于更为广泛的人群。", "example": "举例：“这个星座指南真是太准了！”" },
+            { "id": "17", "name": "邓宁-克鲁格效应", "description": "能力欠缺的人在自己欠考虑的决定的基础上得出错误结论，但是无法正确认识到自身的不足。", "example": "举例：Francis 自信地向大家保证，冰淇淋里绝对没有海带。" },
+            { "id": "18", "name": "锚定效应", "description": "做决定时我们会依赖先前得到的资讯。把你的思维固定在某处。", "example": "举例：“这东西写着打五折？那肯定老便宜了。”" },
+            { "id": "19", "name": "自动化系统偏差", "description": "我们依赖自动化系统，有时候我们会过于信赖它，以至于其自动纠正过程会影响其原本正确的决定。", "example": "举例：我们会认为机器或者系统比我们更专业、更权威。" },
+            { "id": "20", "name": "谷歌效应 (数字失忆症)", "description": "我们倾向于遗忘那些容易通过搜索引擎得到的信息。", "example": "举例：“那个喜剧片里的演员叫啥来着？？我都查了8次了”" },
+            { "id": "21", "name": "阻抗理论", "description": "当被要求做某事的时候，我们会故意反着来，尤其是当我们感到个人的自由受到威胁时候。", "example": "举例：老师和家长越让孩子去做作业，他越是不肯去。" },
+            { "id": "22", "name": "确认偏差", "description": "我们倾向于找到并记住那些能够证实我们认知的信息。", "example": "举例：你会根据少量证据就佐证一个阴谋论，而无视其相反的证据。" },
+            { "id": "23", "name": "逆火效应", "description": "那些反面证据有时候会产生逆向效果，致使我们更加坚信自己之前的观点。", "example": "举例：推翻你阴谋论的证据，很可能是政府伪造的！" },
+            { "id": "24", "name": "第三人称效应", "description": "我们相信别人比我们自己更加容易受到大众媒体所宣传的消费习惯的影响。", "example": "举例：“你显然是被媒体洗脑了！”" },
+            { "id": "25", "name": "信仰偏见", "description": "我们判断一个论据的强弱，不是看他对结论的支持度有多强，而是看他在我们心中有多大的可信度。", "example": "举例：“Sally说她也支持你那个阴谋论。但她没说出什么证据来。”" },
+            { "id": "26", "name": "可用性级联", "description": "某些事情越是被公开和重复讨论，为了融入社会，我们就越会相信这件事的真实性。", "example": "举例：一个糖果里藏了剃须刀片的故事广为流传，最终许多美国人不再在万圣节时提供自制糖果。" },
+            { "id": "27", "name": "衰落主义", "description": "我们倾向于对旧时光充满浪漫想象，而对未来充满消极态度。", "example": "举例：“在我们那个时代，孩子更懂得尊重！”" },
+            { "id": "28", "name": "维持现状偏见", "description": "我们倾向于让事物保持原状，而偏离原来的变动会被认为是一种损失。", "example": "举例：即使一个APP的服务条款侵犯了 Sally 的隐私，她也不愿意换另一个程序。" },
+            { "id": "29", "name": "沉没成本谬误", "description": "我们付出的成本的多少，会影响我们当前的决策。就算面临损失，我们仍然会坚持已经投入成本的事情投入更多。", "example": "举例：“来都来了，一不做二不休！”" },
+            { "id": "30", "name": "赌徒谬误", "description": "我们会认为某件事情发生的可能性会受到过去事件的影响。", "example": "举例：Alice 猜硬币已经输了9次，下次肯定能猜中。" },
+            { "id": "31", "name": "零风险偏好", "description": "我们倾向于将更小的风险降低为零，而不是选择减少更多的整体风险的另一种方案。", "example": "举例：保险行业之所以能成立，靠的就是这个心理效应。" },
+            { "id": "32", "name": "框架效应", "description": "针对同一个问题，我们常常会根据不同的表达方式而得出不同的结论。", "example": "举例：治愈率为99%的医院听起来比“一万个案例中有100人死亡”的医院更可靠。" },
+            { "id": "33", "name": "刻板印象", "description": "尽管没有关于个人的信息，我们仍然普遍认为某个普遍群体具有特定的某些个性特征。", "example": "举例：中国人都会功夫。" },
+            { "id": "34", "name": "外团体同质效应", "description": "我们认为团体之外的某个群体具有同质性，而自己团体内部的成员较多元化。", "example": "举例：Alice 不打游戏，但她觉得玩游戏的人都一样。" },
+            { "id": "35", "name": "权威偏见", "description": "我们更加相信并且经常被权威人士的意见所左右。", "example": "举例：之前人们推崇马云，哪怕马云胡扯八道都有很多人信；现在人们推崇马斯克，但其实马斯克也有胡扯的时候。" },
+            { "id": "36", "name": "安慰剂效应", "description": "如果我们相信一种治疗方法会起作用，它往往就会产生一定的疗效。", "example": "举例：很多医生会给没有病的病人开没有任何药效的安慰剂，并告诉他们这是某某特效药。" },
+            { "id": "37", "name": "幸存者偏差", "description": "我们往往会倾向于关注在一个过程中存在下来的事物，而忽视那些失败的事物。", "example": "举例：Greg告诉Alice，她的包包生意肯定很好，因为有一家成功的时尚公司运用了同样的策略。但其实其它10家倒闭的公司也用了同样的策略。" },
+            { "id": "38", "name": "精神活动过速", "description": "我们对时间的感知会因为创伤和药物使用和体力消耗而发生改变。", "example": "举例：当汽车差点撞到我的时候，时间都慢了下来……" },
+            { "id": "39", "name": "琐碎定律 (自行车棚效应)", "description": "我们经常会对琐碎的问题过于重视，而往往回避更加复杂的问题。", "example": "举例：当地政府没有考虑如何解决流浪人口问题，而是花了大量时间讨论修建自行车道和车棚的问题。" },
+            { "id": "40", "name": "蔡加尼克效应", "description": "相较于已经完成的工作，人们更加容易记得未完成的工作。", "example": "举例：越是接近完成的时候，越是念念不忘，像追电视剧快要大结局，或是收集某款盲盒。" },
+            { "id": "41", "name": "宜家效应", "description": "我们会对自己亲身参与制作的事物给与更高的价值。", "example": "举例：一个普通的银戒指只要几十块，但是自己花几百块去 diy 一个戒指却觉得很值得。" },
+            { "id": "42", "name": "本·富兰克林效应", "description": "我们喜欢帮助他人，相比于曾经帮助过我们的人，我们更有可能帮助那些我们曾帮助过的人。", "example": "举例：Greg 给 Francis 借了一支钢笔，等Francis又向Greg借5块钱时,Greg很爽快就借了。" },
+            { "id": "43", "name": "旁观者效应", "description": "在一旁围观的人越多，挺身而出去帮助受害者的可能性越低。", "example": "举例：一群学生看到有人打架受伤，没有人报警。" },
+            { "id": "44", "name": "可受暗示性", "description": "我们尤其是儿童，有时候会把提问者所提出的暗示想法误认为是自己的记忆。", "example": "举例：“你从沙发上摔下来是在你妈妈打你之前还是之后？”（这是一个陷阱式提问）" },
+            { "id": "45", "name": "虚假记忆", "description": "我们会错把想象当成记忆。", "example": "举例：Greg 确定 Sally 说了一个关于菠萝的笑话，但这个笑话其实是他自己在电视里看到的。" },
+            { "id": "46", "name": "潜隐记忆", "description": "我们会把真实的记忆当成想象。", "example": "举例：Greg以为他去了墓地，但他确定自己只是做了个很可怕的梦。" },
+            { "id": "47", "name": "集群错觉", "description": "我们会在随机的数据中找到模式和“集群”。", "example": "举例：你看到了一朵云，感觉特别像你的猫。" },
+            { "id": "48", "name": "悲观主义偏差", "description": "有时候我们高估产生不高结果的可能。", "example": "举例：我高考失利了，没有考上好的大学，我这辈子完了。" },
+            { "id": "49", "name": "乐观主义偏差", "description": "有些时候我们会对产生好结果的可能会过于乐观。", "example": "举例：我们会高估自己中彩票的概率。" },
+            { "id": "50", "name": "盲点偏见", "description": "我们不认为自己有偏见，同时认为别人比我们更有偏见。", "example": "举例：如果你有了婚外情，你会说自己压力大、和伴侣感情已破裂等理由。如果搞婚外情的是别人，那肯定是道德败坏，人渣。" }
+        ];
+
+        const grid = document.getElementById('biases-grid');
+
+        // Function to create and append a card
+        function createCard(bias, index) {
+            const card = document.createElement('div');
+            // Add 'fade-in-up' for the scroll animation and a data-index for staggering
+            card.className = 'card rounded-lg p-6 flex flex-col fade-in-up';
+            card.dataset.index = index;
+            
+            card.innerHTML = `
+                <div class="flex-grow">
+                    <div class="flex items-start justify-between">
+                        <h2 class="text-2xl font-bold text-white mb-3">${bias.name}</h2>
+                        <div class="card-number -mt-2 -mr-2 text-right opacity-20">${bias.id}</div>
+                    </div>
+                    <p class="text-slate-400 mb-4 leading-relaxed">${bias.description}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-slate-500 bg-slate-900/50 rounded p-3 border border-slate-700">${bias.example}</p>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Populate the grid with cards
+        biases.forEach((bias, index) => {
+            const cardElement = createCard(bias, index);
+            grid.appendChild(cardElement);
+        });
+
+        // Intersection Observer for scroll animations
+        const animatedElements = document.querySelectorAll('.fade-in-up');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Stagger the animation based on the card's index
+                    const delay = (entry.target.dataset.index % 9) * 80; // Stagger by grid position
+                    entry.target.style.animationDelay = `${delay}ms`;
+                    entry.target.classList.add('is-visible');
+                    // Stop observing once it's visible
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1 // Trigger when 10% of the element is visible
+        });
+
+        animatedElements.forEach(el => {
+            observer.observe(el);
+        });
+
+    </script>
+</body>
+</html>
