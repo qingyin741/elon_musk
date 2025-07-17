@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', 'Noto Sans SC', sans-serif;
@@ -108,23 +108,24 @@
         }
 
         .card-number {
-            font-size: 4rem;
-            font-weight: 700;
-            opacity: 0.15;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            font-size: 8rem;
+            font-weight: 900;
+            line-height: 1;
+            opacity: 0.1;
+            color: var(--accent-color);
         }
         
         .card-title {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), var(--accent-color));
+            background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-fill-color: transparent;
-            filter: drop-shadow(0 2px 10px var(--card-accent-glow));
+            filter: drop-shadow(0 2px 15px var(--card-accent-glow));
         }
 
         .card-description {
-            opacity: 1;
+            opacity: 0.9;
         }
         
         .card-content::-webkit-scrollbar { width: 6px; }
@@ -189,20 +190,6 @@
             width: 0;
             height: 100%;
             transition: width 0.5s ease, background-color 0.6s ease;
-        }
-
-        /* Decorative Quote */
-        .decorative-quote {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14rem;
-            font-weight: 900;
-            color: var(--accent-color);
-            opacity: 0.05;
-            user-select: none;
-            z-index: 1;
         }
 
     </style>
@@ -378,35 +365,19 @@
             card.style.setProperty('--card-accent-glow', palette.accentGlow);
             card.style.setProperty('--accent-color', palette.accent);
             
-            // Smartly format description for multi-line display to avoid widows
-            const lines = bias.description.replace(/([，。])/g, '$1\n').split('\n');
-            const processedLines = [];
-            for(let i = 0; i < lines.length; i++) {
-                let line = lines[i].trim();
-                if (line.length === 0) continue;
-                // If a line is very short (e.g., 1-2 chars) and it's not the last line,
-                // try to merge it with the previous line.
-                if (line.length <= 2 && processedLines.length > 0) {
-                    processedLines[processedLines.length - 1] += ' ' + line;
-                } else {
-                    processedLines.push(line);
-                }
-            }
-            const formattedDescription = processedLines.join('<br>');
-
-
             card.innerHTML = `
-                <div class="card-content p-8 md:p-10 flex flex-col h-full relative">
-                    <span class="decorative-quote">“</span>
-                    <div class="flex items-start justify-between mb-6 z-10">
-                        <h2 class="card-title text-3xl md:text-4xl font-bold">${bias.name}</h2>
-                        <div class="card-number -mt-2 -mr-2 text-right select-none">${bias.id}</div>
-                    </div>
-                    <div class="flex-grow flex items-center justify-center z-10">
-                        <p class="card-description text-3xl md:text-4xl lg:text-5xl font-semibold text-center text-slate-100 leading-normal md:leading-normal lg:leading-normal">${formattedDescription}</p>
-                    </div>
-                    <div class="mt-auto z-10">
-                        <p class="text-base text-slate-300 bg-black/20 rounded-lg p-4 border border-white/10">${bias.example}</p>
+                <div class="card-content p-8 md:p-10 flex flex-col h-full">
+                    <div class="grid grid-cols-3 gap-8 h-full">
+                        <div class="col-span-1 flex flex-col justify-between items-start py-4">
+                            <div class="card-number select-none">${bias.id}</div>
+                            <div class="mt-auto w-full">
+                                <p class="text-base text-slate-400 bg-black/20 rounded-lg p-4 border border-white/10">${bias.example}</p>
+                            </div>
+                        </div>
+                        <div class="col-span-2 flex flex-col justify-center text-left">
+                             <h2 class="card-title text-5xl font-bold mb-6">${bias.name}</h2>
+                             <p class="card-description text-2xl text-slate-200 leading-relaxed">${bias.description}</p>
+                        </div>
                     </div>
                 </div>
             `;
@@ -488,4 +459,4 @@
 
     </script>
 </body>
-</html>
+</ht
