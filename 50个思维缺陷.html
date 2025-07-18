@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>马斯克分享的50个思维陷阱 (稳定版)</title>
+    <title>马斯克分享的50个思维陷阱 (优化版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --accent-color: #3b82f6;
+            --card-accent-glow: rgba(59, 130, 246, 0.5);
+            --card-bg: rgba(17, 24, 39, 0.6);
+            --transition-speed: 0.6s;
+        }
         body {
             font-family: 'Inter', 'Noto Sans SC', sans-serif;
             background-color: #0c0a18;
-            overflow: hidden;
+            /* overflow: hidden; is bad practice, remove it */
         }
 
         #particle-canvas {
@@ -28,163 +34,164 @@
             position: relative;
             width: 100%;
             height: 100%;
+            perspective: 2500px; /* Enable 3D space for children */
         }
-
+        
         .card {
-            --card-accent-glow: rgba(59, 130, 246, 0.5);
-            --card-bg: rgba(2, 6, 23, 0.6);
-            --accent-color: #3b82f6;
-            
             background: var(--card-bg);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: absolute;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            /* Hide all cards by default */
-            display: none; 
-        }
-
-        /* Show only the active card */
-        .card.active {
-            display: flex; /* Use flex to align content */
+            border-radius: 1.5rem; /* More refined border-radius */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1),
+                        filter var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            filter: blur(5px);
+            transform: translateZ(-800px) rotateY(0deg);
         }
         
-        .card::before, .card::after {
+        /* Card states for the deck effect */
+        .card.active {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateZ(0);
+            z-index: 20;
+        }
+        .card.prev {
+            opacity: 0.4;
+            filter: blur(4px);
+            transform: translateX(-50%) translateZ(-400px) rotateY(25deg) scale(0.9);
+            z-index: 10;
+        }
+        .card.next {
+            opacity: 0.4;
+            filter: blur(4px);
+            transform: translateX(50%) translateZ(-400px) rotateY(-25deg) scale(0.9);
+            z-index: 10;
+        }
+
+        .card::before {
             content: '';
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.8;
-        }
-        .card::before {
-            width: 250px;
-            height: 250px;
+            filter: blur(100px);
+            opacity: 0; /* Fade in with the card */
+            width: 300px;
+            height: 300px;
             background-color: var(--card-accent-glow);
-            top: -50px;
-            left: -80px;
+            top: -80px;
+            left: -100px;
+            transition: opacity var(--transition-speed) ease, background-color var(--transition-speed) ease;
         }
-        .card::after {
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, hsla(0, 0%, 100%, 0.2), transparent 70%);
-            bottom: -60px;
-            right: -70px;
+        .active .card::before {
+             opacity: 0.8;
         }
 
         .card-content {
             position: relative;
             z-index: 2;
-            height: 100%;
             width: 100%;
+            height: 100%;
             overflow-y: auto;
+            padding: 2.5rem 3rem;
+            text-align: center;
         }
 
-        .card-number {
-            font-size: 10rem;
-            font-weight: 900;
-            line-height: 0.8;
-            opacity: 0.1;
-            color: var(--accent-color);
-        }
-        
         .card-title {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85));
+            background: linear-gradient(145deg, #ffffff, #e0e0e0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-            filter: drop-shadow(0 2px 15px var(--card-accent-glow));
+            text-shadow: 0 0 30px var(--card-accent-glow);
             line-height: 1.2;
         }
 
-        .card-description { opacity: 0.9; }
-        .card-content::-webkit-scrollbar { width: 6px; }
-        .card-content::-webkit-scrollbar-track { background: transparent; }
-        .card-content::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.3); border-radius: 10px; border: 3px solid transparent; }
-        
-        .header-title, .header-subtitle { opacity: 1; }
+        .card-description { color: #d1d5db; }
+        .card-example {
+            background-color: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #9ca3af;
+        }
 
+        /* Refined Scrollbar */
+        .card-content::-webkit-scrollbar { width: 4px; }
+        .card-content::-webkit-scrollbar-track { background: transparent; }
+        .card-content::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+
+        /* Subtle Navigation Buttons */
         .nav-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background-color: rgba(0, 0, 0, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(30, 30, 30, 0.5);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            z-index: 10;
+            z-index: 30;
+            opacity: 0;
+            transition: all 0.3s ease;
         }
-        .nav-btn:hover {
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-        #prev-btn { left: 5%; }
-        #next-btn { right: 5%; }
+        .deck-container:hover .nav-btn { opacity: 1; }
+        .nav-btn:hover { background-color: rgba(0,0,0,0.7); color: white; }
+        #prev-btn { left: 1%; }
+        #next-btn { right: 1%; }
 
+        /* Progress Bar */
         #progress-container {
             position: absolute;
-            bottom: 5%;
-            left: 50%;
+            bottom: 5%; left: 50%;
             transform: translateX(-50%);
-            width: 80%;
-            max-width: 400px;
+            width: 90%; max-width: 400px;
             z-index: 10;
         }
         #progress-bar {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px; overflow: hidden;
             height: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         #progress-fill {
-            width: 0;
-            height: 100%;
-            transition: width 0.5s ease, background-color 0.6s ease;
+            width: 0; height: 100%;
+            transition: width 0.5s ease-out, background-color var(--transition-speed) ease;
+            background-color: var(--accent-color);
         }
     </style>
 </head>
-<body class="text-slate-200 flex flex-col h-screen">
+<body class="text-slate-200 flex flex-col h-screen antialiased">
 
     <canvas id="particle-canvas"></canvas>
 
     <header class="text-center py-6 z-10 flex-shrink-0">
-        <h1 class="header-title text-3xl md:text-4xl font-bold text-white mb-2">
-            50个思维陷阱
-        </h1>
-        <p class="header-subtitle text-lg md:text-xl text-slate-400 max-w-3xl mx-auto">
-            埃隆·马斯克分享的认知偏差列表
-        </p>
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">50个思维陷阱</h1>
+        <p class="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto">埃隆·马斯克分享的认知偏差列表</p>
     </header>
 
     <main class="flex-grow flex items-center justify-center relative px-4 pb-20">
-        <div id="deck" class="deck-container max-w-3xl h-full max-h-[550px]">
+        <div id="deck" class="deck-container max-w-3xl h-full max-h-[500px]">
             </div>
         
         <button id="prev-btn" class="nav-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
         </button>
         <button id="next-btn" class="nav-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
         </button>
 
         <div id="progress-container">
-            <div id="progress-bar">
-                <div id="progress-fill"></div>
-            </div>
+            <div id="progress-bar"><div id="progress-fill"></div></div>
             <p id="progress-text" class="text-center text-sm text-slate-400 mt-2"></p>
         </div>
     </main>
@@ -192,69 +199,10 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- DATA & CONFIG ---
-        const biases = [
-            { "id": "01", "name": "基本归因错误", "description": "人们经常根据个性或者性格来定义别人，但会用情境因素帮自己开脱。", "example": "举例：Sally上课迟到，肯定是她懒；你自己迟到，就是因为早上太忙乱了。" },
-            { "id": "02", "name": "自私的偏见", "description": "我们的失败是形势所迫，而我们的成功是理所当然。", "example": "举例：你觉得得奖是因为自己努力工作，而不是靠别人的帮助和运气。但如果考试不及格，只是因为睡眠不足而已。" },
-            { "id": "03", "name": "组内偏爱", "description": "我们偏爱同一个圈子的圈内人，而不是圈外人。", "example": "举例：Francis 跟你一个社团，所以你喜欢他多过 Sally。" },
-            { "id": "04", "name": "从众效应", "description": "当个体受到群体的影响，会怀疑并改变自己的观点、判断和行为，朝着与群体大多数人一致的方向变化。", "example": "举例：Sally觉得指尖陀螺对孩子挺好的，Francis 也这么觉得。" },
-            { "id": "05", "name": "群体思维", "description": "希望团队保持一致与和谐，我们有时会为了减少冲突做出一些非理性的决定。", "example": "举例：Sally 想买冰淇淋，Francis 想买T恤，所以你最终建议买印有冰淇淋图案的T恤。" },
-            { "id": "06", "name": "光环效应", "description": "这种爱屋及乌的强烈知觉的品质或特点，就像月晕的光环一样，向周围弥漫、扩散。", "example": "举例：Taylor 这么可爱，她肯定一点也不刻薄！" },
-            { "id": "07", "name": "道德运气", "description": "由于一个好的结果，会提高人们对他道德地位的评价，反之由于一个坏的结果，会降低人们对他道德地位的评价。", "example": "举例：xx文化赢得了xx之争，是因为他们比输掉的人更有德行。" },
-            { "id": "08", "name": "虚假的共识", "description": "我们认为同意我们观点的人比实际同意我们观点的人要多。", "example": "举例：“所有人都这么想！”" },
-            { "id": "09", "name": "知识的诅咒", "description": "一旦我们知道某种东西，我们就会认为其他人都知道它。", "example": "举例：Alice是一名架构师，他很难站在程序员小白的角度来理解他们不懂的地方。" },
-            { "id": "10", "name": "聚光灯效应", "description": "一般是指人觉得自己会一定受到别人的关注，而将自己的问题无限放大。", "example": "举例：Sally 很担心大家会注意到她的冰淇淋T恤有多丑。" },
-            { "id": "11", "name": "可用性启发", "description": "做决定时，我们会依赖于脑海中直接浮现的例子。", "example": "举例：选择商店时，你通常会选择最近看到过广告的那家。" },
-            { "id": "12", "name": "防御性归因", "description": "当我们与受害者共情时，我们会减少对受害方的指责，增加对攻击方的指控。", "example": "举例：Sally等绿灯时一直在车里玩手机，结果被追尾了。目击事故的Greg 也有开车发短信的习惯。" },
-            { "id": "13", "name": "公正世界假说", "description": "我们倾向于认为这个世界是公正的，我们认为遭受不公是活该。", "example": "举例：我们通常会认定穷人之所以穷是因为懒惰，要么是因为愚蠢，要么两者都有。" },
-            { "id": "14", "name": "朴素现实主义", "description": "我们相信自己观察到的就是客观现实，而其他人则是不理性，不知情或者有偏见的。", "example": "举例：“我看到了这个世界的真面目，其他人都很蠢”" },
-            { "id": "15", "name": "朴素犬儒主义", "description": "我们认为自己观察到的就是客观现实，而其他人的所作所为都会更加以自我为中心且有所图谋。", "example": "举例：“这人对我好的唯一原因，肯定是想从我这得到点什么。”" },
-            { "id": "16", "name": "富勒效应 (巴纳姆效应)", "description": "我们容易将我们的个性归纳为模糊的陈述，即使它适用于更为广泛的人群。", "example": "举例：“这个星座指南真是太准了！”" },
-            { "id": "17", "name": "邓宁-克鲁格效应", "description": "能力欠缺的人在自己欠考虑的决定的基础上得出错误结论，但是无法正确认识到自身的不足。", "example": "举例：Francis 自信地向大家保证，冰淇淋里绝对没有海带。" },
-            { "id": "18", "name": "锚定效应", "description": "做决定时我们会依赖先前得到的资讯。把你的思维固定在某处。", "example": "举例：“这东西写着打五折？那肯定老便宜了。”" },
-            { "id": "19", "name": "自动化系统偏差", "description": "我们依赖自动化系统，有时候我们会过于信赖它。", "example": "举例：我们会认为机器或者系统比我们更专业、更权威。" },
-            { "id": "20", "name": "谷歌效应 (数字失忆症)", "description": "我们倾向于遗忘那些容易通过搜索引擎得到的信息。", "example": "举例：“那个喜剧片里的演员叫啥来着？？我都查了8次了”" },
-            { "id": "21", "name": "阻抗理论", "description": "当被要求做某事的时候，我们会故意反着来，尤其当我们感到个人的自由受到威胁时候。", "example": "举例：老师和家长越让孩子去做作业，他越是不肯去。" },
-            { "id": "22", "name": "确认偏差", "description": "我们倾向于找到并记住那些能够证实我们认知的信息。", "example": "举例：你会根据少量证据就佐证一个阴谋论，而无视其相反的证据。" },
-            { "id": "23", "name": "逆火效应", "description": "那些反面证据有时候会产生逆向效果，致使我们更加坚信自己之前的观点。", "example": "举例：推翻你阴谋论的证据，很可能是政府伪造的！" },
-            { "id": "24", "name": "第三人称效应", "description": "我们相信别人比我们自己更加容易受到大众媒体所宣传的消费习惯的影响。", "example": "举例：“你显然是被媒体洗脑了！”" },
-            { "id": "25", "name": "信仰偏见", "description": "我们判断一个论据的强弱，不是看他对结论的支持度有多强，而是看在他我们心中有多大的可信度。", "example": "举例：“Sally说她也支持你那个阴谋论。但她没说出什么证据来。”" },
-            { "id": "26", "name": "可用性级联", "description": "某些事情越是被公开和重复讨论，为了融入社会，我们就越会相信这件事的真实性。", "example": "举例：一个糖果里藏了剃须刀片的故事广为流传，最终许多美国人不再在万圣节时提供自制糖果。" },
-            { "id": "27", "name": "衰落主义", "description": "我们倾向于对旧时光充满浪漫想象，而对未来充满消极态度。", "example": "举例：“在我们那个时代，孩子更懂得尊重！”" },
-            { "id": "28", "name": "维持现状偏见", "description": "我们倾向于让事物保持原状，而偏离原来的变动会被认为是一种损失。", "example": "举例：即使一个APP的服务条款侵犯了 Sally 的隐私，她也不愿意换另一个程序。" },
-            { "id": "29", "name": "沉没成本谬误", "description": "我们付出的成本的多少，会影响我们当前的决策。", "example": "举例：“来都来了，一不做二不休！”" },
-            { "id": "30", "name": "赌徒谬误", "description": "我们会认为某件事情发生的可能性会受到过去事件的影响。", "example": "举例：Alice 猜硬币已经输了9次，下次肯定能猜中。" },
-            { "id": "31", "name": "零风险偏好", "description": "我们倾向于将更小的风险降低为零，而不是选择减少更多的整体风险的另一种方案。", "example": "举例：保险行业之所以能成立，靠的就是这个心理效应。" },
-            { "id": "32", "name": "框架效应", "description": "针对同一个问题，我们常常会根据不同的表达方式而得出不同的结论。", "example": "举例：治愈率为99%的医院听起来比“一万个案例中有100人死亡”的医院更可靠。" },
-            { "id": "33", "name": "刻板印象", "description": "尽管没有关于个人的信息，我们仍然普遍认为某个普遍群体具有特定的某些个性特征。", "example": "举例：中国人都会功夫。" },
-            { "id": "34", "name": "外团体同质效应", "description": "我们认为团体之外的某个群体具有同质性，而自己团体内部的成员较多元化。", "example": "举例：Alice 不打游戏，但她觉得玩游戏的人都一样。" },
-            { "id": "35", "name": "权威偏见", "description": "我们更加相信并且经常被权威人士的意见所左右。", "example": "举例：之前人们推崇马云，哪怕马云胡扯八道都有很多人信；现在人们推崇马斯克，但其实马斯克也有胡扯的时候。" },
-            { "id": "36", "name": "安慰剂效应", "description": "如果我们相信一种治疗方法会起作用，它往往就会产生一定的疗效。", "example": "举例：很多医生会给没有病的病人开没有任何药效的安慰剂，并告诉他们这是某某特效药。" },
-            { "id": "37", "name": "幸存者偏差", "description": "我们往往会倾向于关注在一个过程中存在下来的事物，而忽视那些失败的事物。", "example": "举例：Greg告诉Alice，她的包包生意肯定很好，因为有一家成功的时尚公司运用了同样的策略。" },
-            { "id": "38", "name": "精神活动过速", "description": "我们对时间的感知会因为创伤和药物使用和体力消耗而发生改变。", "example": "举例：当汽车差点撞到我的时候，时间都慢了下来……" },
-            { "id": "39", "name": "琐碎定律 (自行车棚效应)", "description": "我们经常会对琐碎的问题过于重视，而往往回避更加复杂的问题。", "example": "举例：当地政府没有考虑如何解决流浪人口问题，而是花了大量时间讨论修建自行车道和车棚的问题。" },
-            { "id": "40", "name": "蔡加尼克效应", "description": "相较于已经完成的工作，人们更加容易记得未完成的工作。", "example": "举例：越是接近完成的时候，越是念念不忘，像追电视剧快要大结局，或是收集某款盲盒。" },
-            { "id": "41", "name": "宜家效应", "description": "我们会对自己亲身参与制作的事物给与更高的价值。", "example": "举例：一个普通的银戒指只要几十块，但是自己花几百块去 diy 一个戒指却觉得很值得。" },
-            { "id": "42", "name": "本·富兰克林效应", "description": "我们喜欢帮助他人，相比于曾经帮助过我们的人，我们更有可能帮助那些我们曾帮助过的人。", "example": "举例：Greg 给 Francis 借了一支钢笔，等Francis又向Greg借5块钱时,Greg很爽快就借了。" },
-            { "id": "43", "name": "旁观者效应", "description": "在一旁围观的人越多，挺身而出去帮助受害者的可能性越低。", "example": "举例：一群学生看到有人打架受伤，没有人报警。" },
-            { "id": "44", "name": "可受暗示性", "description": "我们尤其是儿童，有时候会把提问者所提出的暗示想法误认为是自己的记忆。", "example": "举例：“你从沙发上摔下来是在你妈妈打你之前还是之后？”（这是一个陷阱式提问）" },
-            { "id": "45", "name": "虚假记忆", "description": "我们会错把想象当成记忆。", "example": "举例：Greg 确定 Sally 说了一个关于菠萝的笑话，但这个笑话其实是他自己在电视里看到的。" },
-            { "id": "46", "name": "潜隐记忆", "description": "我们会把真实的记忆当成想象。", "example": "举例：Greg以为他去了墓地，但他确定自己只是做了个很可怕的梦。" },
-            { "id": "47", "name": "集群错觉", "description": "我们会在随机的数据中找到模式和“集群”。", "example": "举例：你看到了一朵云，感觉特别像你的猫。" },
-            { "id": "48", "name": "悲观主义偏差", "description": "有时候我们高估产生不高结果的可能。", "example": "举例：我高考失利了，没有考上好的大学，我这辈子完了。" },
-            { "id": "49", "name": "乐观主义偏差", "description": "有些时候我们会对产生好结果的可能会过于乐观。", "example": "举例：我们会高估自己中彩票的概率。" },
-            { "id": "50", "name": "盲点偏见", "description": "我们不认为自己有偏见，同时认为别人比我们更有偏见。", "example": "举例：如果你有了婚外情，你会说自己压力大、和伴侣感情已破裂等理由。如果搞婚外情的是别人，那肯定是道德败坏，人渣。" }
-        ];
-        const colorPalettes = [
-            { bg: 'rgba(2, 6, 23, 0.6)', accent: '#3b82f6', accentGlow: 'rgba(59, 130, 246, 0.5)' },
-            { bg: 'rgba(20, 5, 44, 0.6)', accent: '#8b5cf6', accentGlow: 'rgba(139, 92, 246, 0.5)' },
-            { bg: 'rgba(2, 28, 23, 0.6)', accent: '#10b981', accentGlow: 'rgba(16, 185, 129, 0.5)' },
-            { bg: 'rgba(40, 5, 5, 0.6)', accent: '#ef4444', accentGlow: 'rgba(239, 68, 68, 0.5)' },
-            { bg: 'rgba(37, 25, 3, 0.6)', accent: '#f59e0b', accentGlow: 'rgba(245, 158, 11, 0.5)' },
-            { bg: 'rgba(35, 2, 35, 0.6)', accent: '#d946ef', accentGlow: 'rgba(217, 70, 239, 0.5)' },
-            { bg: 'rgba(3, 23, 36, 0.6)', accent: '#06b6d4', accentGlow: 'rgba(6, 182, 212, 0.5)' },
-        ];
-
-        // --- DOM Elements ---
+        const biases = [{"id":"01","name":"基本归因错误","description":"人们经常根据个性或者性格来定义别人，但会用情境因素帮自己开脱。","example":"举例：Sally上课迟到，肯定是她懒；你自己迟到，就是因为早上太忙乱了。"},{"id":"02","name":"自私的偏见","description":"我们的失败是形势所迫，而我们的成功是理所当然。","example":"举例：你觉得得奖是因为自己努力工作，而不是靠别人的帮助和运气。但如果考试不及格，只是因为睡眠不足而已。"},{"id":"03","name":"组内偏爱","description":"我们偏爱同一个圈子的圈内人，而不是圈外人。","example":"举例：Francis 跟你一个社团，所以你喜欢他多过 Sally。"},{"id":"04","name":"从众效应","description":"当个体受到群体的影响，会怀疑并改变自己的观点、判断和行为，朝着与群体大多数人一致的方向变化。","example":"举例：Sally觉得指尖陀螺对孩子挺好的，Francis 也这么觉得。"},{"id":"05","name":"群体思维","description":"希望团队保持一致与和谐，我们有时会为了减少冲突做出一些非理性的决定。","example":"举例：Sally 想买冰淇淋，Francis 想买T恤，所以你最终建议买印有冰淇淋图案的T恤。"},{"id":"06","name":"光环效应","description":"这种爱屋及乌的强烈知觉的品质或特点，就像月晕的光环一样，向周围弥漫、扩散。","example":"举例：Taylor 这么可爱，她肯定一点也不刻薄！"},{"id":"07","name":"道德运气","description":"由于一个好的结果，会提高人们对他道德地位的评价，反之由于一个坏的结果，会降低人们对他道德地位的评价。","example":"举例：xx文化赢得了xx之争，是因为他们比输掉的人更有德行。"},{"id":"08","name":"虚假的共识","description":"我们认为同意我们观点的人比实际同意我们观点的人要多。","example":"举例：“所有人都这么想！”"},{"id":"09","name":"知识的诅咒","description":"一旦我们知道某种东西，我们就会认为其他人都知道它。","example":"举例：Alice是一名架构师，他很难站在程序员小白的角度来理解他们不懂的地方。"},{"id":"10","name":"聚光灯效应","description":"一般是指人觉得自己会一定受到别人的关注，而将自己的问题无限放大。","example":"举例：Sally 很担心大家会注意到她的冰淇淋T恤有多丑。"},{"id":"11","name":"可用性启发","description":"做决定时，我们会依赖于脑海中直接浮现的例子。","example":"举例：选择商店时，你通常会选择最近看到过广告的那家。"},{"id":"12","name":"防御性归因","description":"当我们与受害者共情时，我们会减少对受害方的指责，增加对攻击方的指控。","example":"举例：Sally等绿灯时一直在车里玩手机，结果被追尾了。目击事故的Greg 也有开车发短信的习惯。"},{"id":"13","name":"公正世界假说","description":"我们倾向于认为这个世界是公正的，我们认为遭受不公是活该。","example":"举例：我们通常会认定穷人之所以穷是因为懒惰，要么是因为愚蠢，要么两者都有。"},{"id":"14","name":"朴素现实主义","description":"我们相信自己观察到的就是客观现实，而其他人则是不理性，不知情或者有偏见的。","example":"举例：“我看到了这个世界的真面目，其他人都很蠢”"},{"id":"15","name":"朴素犬儒主义","description":"我们认为自己观察到的就是客观现实，而其他人的所作所为都会更加以自我为中心且有所图谋。","example":"举例：“这人对我好的唯一原因，肯定是想从我这得到点什么。”"},{"id":"16","name":"富勒效应 (巴纳姆效应)","description":"我们容易将我们的个性归纳为模糊的陈述，即使它适用于更为广泛的人群。","example":"举例：“这个星座指南真是太准了！”"},{"id":"17","name":"邓宁-克鲁格效应","description":"能力欠缺的人在自己欠考虑的决定的基础上得出错误结论，但是无法正确认识到自身的不足。","example":"举例：Francis 自信地向大家保证，冰淇淋里绝对没有海带。"},{"id":"18","name":"锚定效应","description":"做决定时我们会依赖先前得到的资讯。把你的思维固定在某处。","example":"举例：“这东西写着打五折？那肯定老便宜了。”"},{"id":"19","name":"自动化系统偏差","description":"我们依赖自动化系统，有时候我们会过于信赖它。","example":"举例：我们会认为机器或者系统比我们更专业、更权威。"},{"id":"20","name":"谷歌效应 (数字失忆症)","description":"我们倾向于遗忘那些容易通过搜索引擎得到的信息。","example":"举例：“那个喜剧片里的演员叫啥来着？？我都查了8次了”"},{"id":"21","name":"阻抗理论","description":"当被要求做某事的时候，我们会故意反着来，尤其当我们感到个人的自由受到威胁时候。","example":"举例：老师和家长越让孩子去做作业，他越是不肯去。"},{"id":"22","name":"确认偏差","description":"我们倾向于找到并记住那些能够证实我们认知的信息。","example":"举例：你会根据少量证据就佐证一个阴谋论，而无视其相反的证据。"},{"id":"23","name":"逆火效应","description":"那些反面证据有时候会产生逆向效果，致使我们更加坚信自己之前的观点。","example":"举例：推翻你阴谋论的证据，很可能是政府伪造的！"},{"id":"24","name":"第三人称效应","description":"我们相信别人比我们自己更加容易受到大众媒体所宣传的消费习惯的影响。","example":"举例：“你显然是被媒体洗脑了！”"},{"id":"25","name":"信仰偏见","description":"我们判断一个论据的强弱，不是看他对结论的支持度有多强，而是看在他我们心中有多大的可信度。","example":"举例：“Sally说她也支持你那个阴谋论。但她没说出什么证据来。”"},{"id":"26","name":"可用性级联","description":"某些事情越是被公开和重复讨论，为了融入社会，我们就越会相信这件事的真实性。","example":"举例：一个糖果里藏了剃须刀片的故事广为流传，最终许多美国人不再在万圣节时提供自制糖果。"},{"id":"27","name":"衰落主义","description":"我们倾向于对旧时光充满浪漫想象，而对未来充满消极态度。","example":"举例：“在我们那个时代，孩子更懂得尊重！”"},{"id":"28","name":"维持现状偏见","description":"我们倾向于让事物保持原状，而偏离原来的变动会被认为是一种损失。","example":"举例：即使一个APP的服务条款侵犯了 Sally 的隐私，她也不愿意换另一个程序。"},{"id":"29","name":"沉没成本谬误","description":"我们付出的成本的多少，会影响我们当前的决策。","example":"举例：“来都来了，一不做二不休！”"},{"id":"30","name":"赌徒谬误","description":"我们会认为某件事情发生的可能性会受到过去事件的影响。","example":"举例：Alice 猜硬币已经输了9次，下次肯定能猜中。"},{"id":"31","name":"零风险偏好","description":"我们倾向于将更小的风险降低为零，而不是选择减少更多的整体风险的另一种方案。","example":"举例：保险行业之所以能成立，靠的就是这个心理效应。" }, { "id": "32", "name": "框架效应", "description": "针对同一个问题，我们常常会根据不同的表达方式而得出不同的结论。", "example": "举例：治愈率为99%的医院听起来比“一万个案例中有100人死亡”的医院更可靠。" }, { "id": "33", "name": "刻板印象", "description": "尽管没有关于个人的信息，我们仍然普遍认为某个普遍群体具有特定的某些个性特征。", "example": "举例：中国人都会功夫。" }, { "id": "34", "name": "外团体同质效应", "description": "我们认为团体之外的某个群体具有同质性，而自己团体内部的成员较多元化。", "example": "举例：Alice 不打游戏，但她觉得玩游戏的人都一样。" }, { "id": "35", "name": "权威偏见", "description": "我们更加相信并且经常被权威人士的意见所左右。", "example": "举例：之前人们推崇马云，哪怕马云胡扯八道都有很多人信；现在人们推崇马斯克，但其实马斯克也有胡扯的时候。" }, { "id": "36", "name": "安慰剂效应", "description": "如果我们相信一种治疗方法会起作用，它往往就会产生一定的疗效。", "example": "举例：很多医生会给没有病的病人开没有任何药效的安慰剂，并告诉他们这是某某特效药。" }, { "id": "37", "name": "幸存者偏差", "description": "我们往往会倾向于关注在一个过程中存在下来的事物，而忽视那些失败的事物。", "example": "举例：Greg告诉Alice，她的包包生意肯定很好，因为有一家成功的时尚公司运用了同样的策略。" }, { "id": "38", "name": "精神活动过速", "description": "我们对时间的感知会因为创伤和药物使用和体力消耗而发生改变。", "example": "举例：当汽车差点撞到我的时候，时间都慢了下来……" }, { "id": "39", "name": "琐碎定律 (自行车棚效应)", "description": "我们经常会对琐碎的问题过于重视，而往往回避更加复杂的问题。", "example": "举例：当地政府没有考虑如何解决流浪人口问题，而是花了大量时间讨论修建自行车道和车棚的问题。" }, { "id": "40", "name": "蔡加尼克效应", "description": "相较于已经完成的工作，人们更加容易记得未完成的工作。", "example": "举例：越是接近完成的时候，越是念念不忘，像追电视剧快要大结局，或是收集某款盲盒。" }, { "id": "41", "name": "宜家效应", "description": "我们会对自己亲身参与制作的事物给与更高的价值。", "example": "举例：一个普通的银戒指只要几十块，但是自己花几百块去 diy 一个戒指却觉得很值得。" }, { "id": "42", "name": "本·富兰克林效应", "description": "我们喜欢帮助他人，相比于曾经帮助过我们的人，我们更有可能帮助那些我们曾帮助过的人。", "example": "举例：Greg 给 Francis 借了一支钢笔，等Francis又向Greg借5块钱时,Greg很爽快就借了。" }, { "id": "43", "name": "旁观者效应", "description": "在一旁围观的人越多，挺身而出去帮助受害者的可能性越低。", "example": "举例：一群学生看到有人打架受伤，没有人报警。" }, { "id": "44", "name": "可受暗示性", "description": "我们尤其是儿童，有时候会把提问者所提出的暗示想法误认为是自己的记忆。", "example": "举例：“你从沙发上摔下来是在你妈妈打你之前还是之后？”（这是一个陷阱式提问）" }, { "id": "45", "name": "虚假记忆", "description": "我们会错把想象当成记忆。", "example": "举例：Greg 确定 Sally 说了一个关于菠萝的笑话，但这个笑话其实是他自己在电视里看到的。" }, { "id": "46", "name": "潜隐记忆", "description": "我们会把真实的记忆当成想象。", "example": "举例：Greg以为他去了墓地，但他确定自己只是做了个很可怕的梦。" }, { "id": "47", "name": "集群错觉", "description": "我们会在随机的数据中找到模式和“集群”。", "example": "举例：你看到了一朵云，感觉特别像你的猫。" }, { "id": "48", "name": "悲观主义偏差", "description": "有时候我们高估产生不高结果的可能。", "example": "举例：我高考失利了，没有考上好的大学，我这辈子完了。" }, { "id": "49", "name": "乐观主义偏差", "description": "有些时候我们会对产生好结果的可能会过于乐观。", "example": "举例：我们会高估自己中彩票的概率。" }, { "id": "50", "name": "盲点偏见", "description": "我们不认为自己有偏见，同时认为别人比我们更有偏见。", "example": "举例：如果你有了婚外情，你会说自己压力大、和伴侣感情已破裂等理由。如果搞婚外情的是别人，那肯定是道德败坏，人渣。" }];
+        const colorPalettes = [ { bg: 'rgba(17, 24, 39, 0.6)', accent: '#3b82f6', accentGlow: 'rgba(59, 130, 246, 0.5)' }, { bg: 'rgba(31, 15, 59, 0.6)', accent: '#8b5cf6', accentGlow: 'rgba(139, 92, 246, 0.5)' }, { bg: 'rgba(5, 38, 30, 0.6)', accent: '#10b981', accentGlow: 'rgba(16, 185, 129, 0.5)' }, { bg: 'rgba(60, 16, 16, 0.6)', accent: '#ef4444', accentGlow: 'rgba(239, 68, 68, 0.5)' }, { bg: 'rgba(60, 42, 10, 0.6)', accent: '#f59e0b', accentGlow: 'rgba(245, 158, 11, 0.5)' }, { bg: 'rgba(56, 11, 56, 0.6)', accent: '#d946ef', accentGlow: 'rgba(217, 70, 239, 0.5)' }, { bg: 'rgba(11, 38, 52, 0.6)', accent: '#06b6d4', accentGlow: 'rgba(6, 182, 212, 0.5)' },];
+        
+        // --- DOM Elements & State ---
         const deck = document.getElementById('deck');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
@@ -262,68 +210,57 @@
         const progressText = document.getElementById('progress-text');
         const root = document.documentElement;
         
-        // --- State ---
         let cards = [];
         let currentIndex = 0;
+        let isWheeling = false;
 
         // --- Functions ---
         function createCard(bias, index) {
             const card = document.createElement('div');
-            const palette = colorPalettes[index % colorPalettes.length];
-            card.className = 'card rounded-lg'; // Keep basic classes
-            card.style.setProperty('--card-bg', palette.bg);
-            card.style.setProperty('--card-accent-glow', palette.accentGlow);
-            card.style.setProperty('--accent-color', palette.accent);
+            card.className = 'card';
+            card.dataset.index = index;
             card.innerHTML = `
-                <div class="card-content p-8 md:p-10">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 h-full">
-                        <div class="md:col-span-1 flex flex-col justify-between items-start py-4 order-2 md:order-1">
-                            <div class="card-number select-none hidden md:block">${bias.id}</div>
-                            <div class="mt-auto w-full">
-                                <p class="text-base text-slate-400 bg-black/20 rounded-lg p-4 border border-white/10">${bias.example}</p>
-                            </div>
-                        </div>
-                        <div class="md:col-span-2 flex flex-col justify-center text-left order-1 md:order-2">
-                             <h2 class="card-title text-3xl md:text-5xl font-bold mb-4 md:mb-6">${bias.name}</h2>
-                             <p class="card-description text-xl md:text-2xl text-slate-200 leading-relaxed">${bias.description}</p>
-                        </div>
-                    </div>
+                <div class="card-content flex flex-col justify-center">
+                    <div class="absolute top-6 right-8 text-2xl font-bold" style="color: var(--accent-color); opacity: 0.4;">${bias.id}</div>
+                    <h2 class="card-title text-3xl md:text-5xl font-bold mb-4">${bias.name}</h2>
+                    <p class="card-description text-xl md:text-2xl text-slate-300 leading-relaxed max-w-2xl mx-auto mb-8">${bias.description}</p>
+                    <p class="card-example text-base p-4 rounded-lg max-w-xl mx-auto">${bias.example}</p>
                 </div>`;
             return card;
         }
+        
+        function updateDeck() {
+            const activeCard = cards[currentIndex];
+            const palette = colorPalettes[currentIndex % colorPalettes.length];
 
-        function updateUI() {
+            // Update CSS variables for smooth transitions
+            root.style.setProperty('--accent-color', palette.accent);
+            root.style.setProperty('--card-accent-glow', palette.accentGlow);
+            root.style.setProperty('--card-bg', palette.bg);
+            
+            cards.forEach((card, index) => {
+                card.classList.remove('active', 'prev', 'next');
+                if (index === currentIndex) {
+                    card.classList.add('active');
+                } else if (index === (currentIndex - 1 + cards.length) % cards.length) {
+                    card.classList.add('prev');
+                } else if (index === (currentIndex + 1) % cards.length) {
+                    card.classList.add('next');
+                }
+            });
+
+            // Update Progress Bar
             const progressPercentage = ((currentIndex + 1) / biases.length) * 100;
             progressFill.style.width = `${progressPercentage}%`;
             progressText.textContent = `${currentIndex + 1} / ${biases.length}`;
-            
-            const activeCard = cards[currentIndex];
-            if (activeCard) {
-                const accentColor = activeCard.style.getPropertyValue('--accent-color');
-                progressFill.style.backgroundColor = accentColor;
-                root.style.setProperty('--accent-color', accentColor);
-            }
-        }
-        
-        // Simple, instant card switching function
-        function showCard(index) {
-            if (index < 0 || index >= cards.length) return;
-
-            // Hide all cards by removing the 'active' class
-            cards.forEach(card => card.classList.remove('active'));
-
-            // Show the new card by adding the 'active' class
-            cards[index].classList.add('active');
-            
-            currentIndex = index;
-            updateUI();
         }
 
         function navigate(direction) {
             const newIndex = direction === 'next'
                 ? (currentIndex + 1) % biases.length
                 : (currentIndex - 1 + biases.length) % biases.length;
-            showCard(newIndex);
+            currentIndex = newIndex;
+            updateDeck();
         }
 
         // --- Initialization ---
@@ -333,63 +270,39 @@
             cards.push(cardElement);
         });
         
-        showCard(0);
+        updateDeck(); // Set initial state
 
         // --- Event Listeners ---
         nextBtn.addEventListener('click', () => navigate('next'));
         prevBtn.addEventListener('click', () => navigate('prev'));
         
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') navigate('next');
-            else if (e.key === 'ArrowLeft') navigate('prev');
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate('next');
+            else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate('prev');
         });
 
-        document.addEventListener('wheel', (e) => {
-            // A simple throttle for wheel to prevent it firing too fast
-            let wheelTimeout;
-            clearTimeout(wheelTimeout);
-            wheelTimeout = setTimeout(() => {
-                if (e.deltaY > 0) {
-                    navigate('next');
-                } else {
-                    navigate('prev');
-                }
-            }, 50); // A small delay to debounce wheel events
-        });
+        // Debounced wheel navigation for a smoother experience
+        deck.addEventListener('wheel', (e) => {
+            if (isWheeling) return;
+            isWheeling = true;
+            
+            if (e.deltaY > 0) {
+                navigate('next');
+            } else {
+                navigate('prev');
+            }
+            
+            setTimeout(() => { isWheeling = false; }, 800); // Debounce time, should be > transition time
+        }, { passive: true });
         
-        // --- Particle background ---
+        // --- Particle background (unchanged from original) ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particlesArray;
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            initParticles();
-        }
-        class Particle {
-            constructor(x, y, dirX, dirY, size, color) { this.x = x; this.y = y; this.directionX = dirX; this.directionY = dirY; this.size = size; this.color = color; }
-            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); }
-            update() {
-                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-                this.x += this.directionX; this.y += this.directionY; this.draw();
-            }
-        }
-        function initParticles() {
-            particlesArray = [];
-            let num = (canvas.height * canvas.width) / 9000;
-            for (let i = 0; i < num; i++) {
-                let size = (Math.random() * 2) + 1;
-                let x = Math.random() * innerWidth; let y = Math.random() * innerHeight;
-                let dirX = (Math.random() * 0.4) - 0.2; let dirY = (Math.random() * 0.4) - 0.2;
-                particlesArray.push(new Particle(x, y, dirX, dirY, size, `rgba(255, 255, 255, ${Math.random() * 0.3 + 0.1})`));
-            }
-        }
-        function animateParticles() {
-            requestAnimationFrame(animateParticles);
-            ctx.clearRect(0, 0, innerWidth, innerHeight);
-            if(particlesArray) particlesArray.forEach(p => p.update());
-        }
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initParticles(); }
+        class Particle { constructor(x,y,dirX,dirY,size,color){this.x=x;this.y=y;this.directionX=dirX;this.directionY=dirY;this.size=size;this.color=color;} draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();} update(){if(this.x>canvas.width||this.x<0)this.directionX=-this.directionX;if(this.y>canvas.height||this.y<0)this.directionY=-this.directionY;this.x+=this.directionX;this.y+=this.directionY;this.draw();}}
+        function initParticles() { particlesArray=[];let num=(canvas.height*canvas.width)/9e3;for(let i=0;i<num;i++){let size=Math.random()*2+1;let x=Math.random()*innerWidth;let y=Math.random()*innerHeight;let dirX=Math.random()*.4-.2;let dirY=Math.random()*.4-.2;particlesArray.push(new Particle(x,y,dirX,dirY,size,`rgba(255,255,255,${Math.random()*.3+.1})`));}}
+        function animateParticles() { requestAnimationFrame(animateParticles);ctx.clearRect(0,0,innerWidth,innerHeight);if(particlesArray)particlesArray.forEach(p=>p.update());}
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
         animateParticles();
